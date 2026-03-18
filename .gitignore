@@ -1,6 +1,9 @@
 # Ignore virtual environments
 prototype/
 
+#Ignore temporary cube file
+temp_cube.cube
+
 #Ignore dumps
 dumps/
 
