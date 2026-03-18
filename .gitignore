@@ -1,0 +1,11 @@
+# Ignore virtual environments
+prototype/
+
+#Ignore dumps
+dumps/
+
+#Ignore pycache
+__pycache__/
+
+# Ignore OS files
+.DS_Store

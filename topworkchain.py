@@ -1,11 +1,12 @@
 from subworkchains import OrcaWorkChain, NTOProcessingWorkChain
-from aiida.orm import Dict
+from aiida.orm import Dict, SinglefileData, FolderData
 from aiida.engine import WorkChain, run_get_node, run
 
 class PrototypeTopWorkChain(WorkChain):
     @classmethod
     def define(cls, spec):
         super().define(spec)
+        spec.output("cube_folder", valid_type=FolderData, help="Compressed cube files")
         spec.outline(
             cls.calc,
             cls.convert
@@ -28,6 +29,16 @@ class PrototypeTopWorkChain(WorkChain):
         builder = NTOProcessingWorkChain.get_builder()
         builder.nto_folder = self.ctx.nto_folder
         results, node = run_get_node(NTOProcessingWorkChain, builder)
+        #Returns a folder containing all of the compressed cube files (currently just one).
+        cube_folder = FolderData()
+        for label, value in results.items():
+            print(value)
+            with value.open(mode="rb") as file:
+                cube_folder.put_object_from_filelike(file, path=label)
+        cube_folder.store()
+        self.out("cube_folder", cube_folder)
+
+
 
     
 
