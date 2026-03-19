@@ -75,12 +75,14 @@ class NTOProcessingWorkChain(WorkChain):
         orca_plot = load_code("orca_plot@localhost")
         #Define folder with NTOs
         folder = self.inputs.nto_folder
+        #Define electronic transition.
+        s=1
         #Define the specific molecular orbital to plot.
         mo=14
         #Create SinglefileData node with orca_plot options (wrapped in a temporary BytesIO file).
         plot_options_node = SinglefileData(file=io.BytesIO(("1\n1\n3\n0\n5\n7\n2\n"+str(mo)+"\n10\n11\n").encode("utf-8")), filename="plot_input.txt")
         #Define NTO filename.
-        nto_filename = "aiida.s1.nto"        
+        nto_filename = "aiida.s"+str(s)+".nto"        
         #Create SinglefileData node with NTO data.
         with folder.open(nto_filename, mode="rb") as nto_file:
             nto_data_node = SinglefileData(file=nto_file, filename=nto_filename)
@@ -95,7 +97,7 @@ class NTOProcessingWorkChain(WorkChain):
             outputs=["*.cube"]
         )
         #Extract the cube file from the results (obviously this currently only works for this specific example).
-        self.ctx.uncompressed_cube = results["aiida_s1_mo14a_cube"]
+        self.ctx.uncompressed_cube = results["aiida_s"+str(s)+"_mo"+str(mo)+"a_cube"]
 
     def cube_compress(self):
         #Defining the original cube file.
