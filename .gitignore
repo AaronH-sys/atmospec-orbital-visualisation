@@ -12,3 +12,6 @@ __pycache__/
 
 # Ignore OS files
 .DS_Store
+
+# Ignore extracted cubes
+extracted_cubes/*
