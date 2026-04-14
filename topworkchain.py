@@ -32,8 +32,7 @@ class PrototypeTopWorkChain(WorkChain):
     
     #Parses the output to find relavant molecular orbitals.
     def parse(self):
-        test_args = ["aiida.out", "--threshold", "5.0", "--nto"]
-        self.ctx.relevant_dict = parse_orca_output(self.ctx.nto_folder, test_args)
+        self.ctx.relevant_dict = parse_orca_output(self.ctx.nto_folder, "aiida.out", 5.0)
         self.out("transition_info", self.ctx.relevant_dict)
 
     
