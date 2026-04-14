@@ -1,0 +1,17 @@
+# Ignore virtual environments
+prototype/
+
+#Ignore temporary cube file
+temp_cube.cube
+
+#Ignore dumps
+dumps/
+
+#Ignore pycache
+__pycache__/
+
+# Ignore OS files
+.DS_Store
+
+# Ignore extracted cubes
+extracted_cubes/*
