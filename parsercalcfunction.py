@@ -16,7 +16,8 @@ def parse_orca_output(nto_folder, arguments):
     #alternatively replace 'cm⁻¹' with 'cm-1' in the table header (close to the end of script)
     #alternatively you can configure the windows console with "set PYTHONIOENCODING=utf-8" before starting the script
     #replace 'cm⁻¹' with 'cm-1' for pdf file conversion with pandoc in case of unicode issues
-    sys.stdout.reconfigure(encoding='utf-8')                                                     
+    if hasattr(sys.stdout, 'reconfigure'):
+        sys.stdout.reconfigure(encoding='utf-8')                                                     
 
     # global constants
     found_uv_section = False                                                                 #check for uv data in out
