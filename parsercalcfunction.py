@@ -1,8 +1,8 @@
 from aiida.engine import calcfunction
-from aiida.orm import Dict
+from aiida.orm import Dict, Float, Str, Bool
 
 @calcfunction
-def parse_orca_output(nto_folder, arguments):    
+def parse_orca_output(nto_folder, filename, threshold=0, states="all", nto=True):    
     # -*- coding: utf-8 -*-
     '''
     # orca-st
@@ -10,7 +10,6 @@ def parse_orca_output(nto_folder, arguments):
 
     import sys                              #system
     import re                               #regular expressions
-    import argparse                         #argument parser
 
     #remove comment in case you get an encoding error when saving the output to a file with ">" under windows
     #alternatively replace 'cm⁻¹' with 'cm-1' in the table header (close to the end of script)
@@ -19,6 +18,16 @@ def parse_orca_output(nto_folder, arguments):
     if hasattr(sys.stdout, 'reconfigure'):
         sys.stdout.reconfigure(encoding='utf-8')                                                     
 
+    #Convert from Aiida nodes to python datatypes if required.
+    if hasattr(filename, "value"):
+        filename = filename.value
+    if hasattr(threshold, "value"):
+        threshold = threshold.value
+    if hasattr(states, "value"):
+        states = states.value
+    if hasattr(nto, "value"):
+        nto = nto.value
+
     # global constants
     found_uv_section = False                                                                 #check for uv data in out
     specstring_start = 'ABSORPTION SPECTRUM VIA TRANSITION ELECTRIC DIPOLE MOMENTS'          #check orca.out from here
@@ -26,7 +35,6 @@ def parse_orca_output(nto_folder, arguments):
     state_string_start = 'TD-DFT/TDA EXCITED STATES'                                         #check for states from here
     state_string_end = 'TD-DFT/TDA-EXCITATION SPECTRA'                                       #stop reading states from here
     nto_string_start ='NATURAL TRANSITION ORBITALS'                                          #NTOs start here
-    threshold = 0                                                                            #default threshold
     found_nto = False                                                                        #found NTOs in orca.out
     #for ORCA 6
     state = 0                                                                                #ORCA 6 does not list the state in the table
@@ -48,62 +56,16 @@ def parse_orca_output(nto_folder, arguments):
     nto_orblist=list()            #list of orbital -> orbital transition for NTOs
     nto_statedict=dict()          #dictionary of states with all transitions for NTOs
 
-
-    # parse arguments
-    parser = argparse.ArgumentParser(prog='orca_st', 
-        description='Easily get states from from orca.out into tables\n'
-                    '-----------------------------------------------\n'
-                    'create tables are in markdown format:\n'
-                    '(python) orca-st.py filename > filename.md\n'
-                    'convert to docx with pandoc (external program):\n'
-                    'pandoc filename.md -o filename.docx',
-                    formatter_class=argparse.RawTextHelpFormatter)
-
-    #filename is required
-    parser.add_argument("filename", help="the ORCA output file")
-
-    #select states
-    parser.add_argument('-s','--states',
-        default='all',
-        help='select one ore more or all states\n'
-        'e.g. -s 1,2,3,29,30')
-
-    #threshold
-    parser.add_argument('-t','--threshold',
-        type = float,
-        default=0,
-        help='define a threshold in %% \n'
-        'transitions below the threshold will not be printed\n'
-        'e.g. -t 2')
-
-    #NTO
-    parser.add_argument('-nto','--nto',
-        default=0, action='store_true',
-        help='select NTO transitions')
-
-    #include Transition
-    parser.add_argument('-tr','--trans',
-        default=0, action='store_true',
-        help='include Transition in case of ORCA 6')
-
-    #parse arguments
-    args = parser.parse_args(arguments)
-
-    #change values according to arguments
-    nto = args.nto
-
     #check if threshold is between 0 and 100%, reset if not
-    if args.threshold:
-        if args.threshold > 100 or args.threshold < 0:
+    if threshold:
+        if threshold > 100 or threshold < 0:
             print("Warning! Threshold out of range. Reset to 0.")
             threshold=0
-        else:
-            threshold = args.threshold
             
     #open a file
     #check existence
     try:
-        with nto_folder.open(args.filename) as input_file:
+        with nto_folder.open(filename) as input_file:
             for line in input_file:
                 #start exctract text 
                 if state_string_start in line:
@@ -161,28 +123,28 @@ def parse_orca_output(nto_folder, arguments):
 
     #file not found -> exit here
     except IOError:
-        print(f"'{args.filename}'" + " not found")
+        print(f"'{filename}'" + " not found")
         sys.exit(1)
 
     #no UV data in orca.out -> exit here
     if found_uv_section == False:
-        print(f"'{specstring_start}'" + " not found in " + f"'{args.filename}'")
+        print(f"'{specstring_start}'" + " not found in " + f"'{filename}'")
         sys.exit(1)
         
     #no NTO data in orca.out -> exit here
     if nto == True and found_nto == False:
-        print(f"'{nto_string_start}'" + " not found in " + f"'{args.filename}'")
+        print(f"'{nto_string_start}'" + " not found in " + f"'{filename}'")
         sys.exit(1)
 
     #build selected_statedict from statedict with selected states
     try:
-        if args.states == 'all':
+        if states == 'all':
             if nto:
                 selected_statedict = nto_statedict
             else:
                 selected_statedict = statedict
-        elif re.search(r"\d",args.states):
-            matchstateslist=(re.findall(r"\d+",args.states))
+        elif re.search(r"\d",states):
+            matchstateslist=(re.findall(r"\d+",states))
             for elements in matchstateslist:
                 if nto:
                     selected_statedict[elements]=nto_statedict[elements]

@@ -8,6 +8,7 @@ class PrototypeTopWorkChain(WorkChain):
     def define(cls, spec):
         super().define(spec)
         spec.output("cube_folder", valid_type=FolderData, help="Compressed cube files")
+        spec.output("transition_info", valid_type=Dict, help="Information about the relevant electronic transitions.")
         spec.outline(
             cls.calc,
             cls.parse,
@@ -31,9 +32,8 @@ class PrototypeTopWorkChain(WorkChain):
     
     #Parses the output to find relavant molecular orbitals.
     def parse(self):
-        test_args = ["aiida.out", "--threshold", "5.0", "--nto"]
-        self.ctx.relevant_dict = parse_orca_output(self.ctx.nto_folder, test_args)
-        print(self.ctx.relevant_dict)
+        self.ctx.relevant_dict = parse_orca_output(self.ctx.nto_folder, "aiida.out", 5.0)
+        self.out("transition_info", self.ctx.relevant_dict)
 
     
     def convert(self):
@@ -42,7 +42,7 @@ class PrototypeTopWorkChain(WorkChain):
         #results, node = run_get_node(NTOProcessingWorkChain, builder)
         #Returns a folder containing all of the compressed cube files (currently just one).
         cube_folder = FolderData()
-        #Create a list of relevant mo data for each excitation. 
+        #Create a list of tuples containing relevant mo data for each excitation. 
         relevant_items = list(self.ctx.relevant_dict.items())
         #Iterating through the list.
         for excitation in relevant_items:
