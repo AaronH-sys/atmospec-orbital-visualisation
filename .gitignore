@@ -15,3 +15,4 @@ __pycache__/
 
 # Ignore extracted cubes
 extracted_cubes/*
+extracted_cubes_*
