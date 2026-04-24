@@ -1,4 +1,4 @@
-from aiida.engine import WorkChain, calcfunction, ToContext, run_get_node
+from aiida.engine import WorkChain, calcfunction, run
 from aiida.orm import SinglefileData, StructureData, Dict, FolderData, Str, load_code
 from aiida.plugins import CalculationFactory
 from aiida_shell import launch_shell_job
@@ -13,7 +13,6 @@ class OrcaWorkChain(WorkChain):
     @classmethod
     def define(cls, spec):
         super().define(spec)
-        #spec.input("geometry", valid_type = SinglefileData, help="Test geometry (.xyz file)")
         spec.input("parameters", valid_type = Dict, help = "Dictionary of orca parameters")
         spec.output("nto_folder", valid_type=FolderData, help="ORCA output files.")
         spec.outline(
@@ -46,13 +45,9 @@ class OrcaWorkChain(WorkChain):
             "additional_retrieve_list": ["*.nto", "aiida.out"],
             "resources": {'num_machines': 1, 'num_mpiprocs_per_machine': 1},
         }
-        #Run ORCA (requires RabbitMQ, not configured by default on the "presto" profile)
-        #Also I cannot get it to work at all at the moment so using run_get_node instead.
-        # process = self.submit(builder)
-        # return ToContext(calc=process)
-        
-        #Run without RabbitMQ
-        results, node = run_get_node(builder)
+
+        #Run ORCA
+        results = run(builder)
         #Return the output folder.
         self.out("nto_folder", results["retrieved"])
 
@@ -105,7 +100,7 @@ class NTOProcessingWorkChain(WorkChain):
         #Defining the original cube file.
         orig_file = self.ctx.uncompressed_cube
         
-        #calcfunction required to create the new cube file "In order to preserve data provenance" apparently.
+        #calcfunction required to create the new cube file.
         compressed_node = calc_compression(orig_file)
         
 
@@ -115,7 +110,7 @@ class NTOProcessingWorkChain(WorkChain):
 
 @calcfunction
 def calc_compression(orig_file):
-    #Cubehandler requires a local file to read from, so we create a temporary file (bit of a bodge).
+    #Cubehandler requires a local file to read from, so we create a temporary file.
     temp_in = "temp.cube"
     #Opening the original cube file.
     with orig_file.open(mode="rb") as orig_handle:

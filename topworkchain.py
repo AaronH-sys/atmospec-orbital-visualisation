@@ -39,8 +39,7 @@ class PrototypeTopWorkChain(WorkChain):
     def convert(self):
         builder = NTOProcessingWorkChain.get_builder()
         builder.nto_folder = self.ctx.nto_folder
-        #results, node = run_get_node(NTOProcessingWorkChain, builder)
-        #Returns a folder containing all of the compressed cube files (currently just one).
+        #Returns a folder containing all of the compressed cube files.
         cube_folder = FolderData()
         #Create a list of tuples containing relevant mo data for each excitation. 
         relevant_items = list(self.ctx.relevant_dict.items())
@@ -55,11 +54,11 @@ class PrototypeTopWorkChain(WorkChain):
                     #Set specific mo.
                     mo = moa[:-1]
                     builder.mo = mo
-                    results, node = run_get_node(NTOProcessingWorkChain, builder)
+                    results = run(NTOProcessingWorkChain, builder)
                     for label, value in results.items():
                         print(value)
                         with value.open(mode="rb") as file:
-                            cube_folder.put_object_from_filelike(file, path=("s"+s+"."+mo))
+                            cube_folder.put_object_from_filelike(file, path=("s"+s+"_"+mo))
         cube_folder.store()
         self.out("cube_folder", cube_folder)
 
