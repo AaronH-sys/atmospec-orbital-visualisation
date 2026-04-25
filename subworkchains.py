@@ -1,4 +1,4 @@
-from aiida.engine import WorkChain, calcfunction, ToContext, run_get_node
+from aiida.engine import WorkChain, calcfunction, run
 from aiida.orm import SinglefileData, StructureData, Dict, FolderData, Str, load_code
 from aiida.plugins import CalculationFactory
 from aiida_shell import launch_shell_job
@@ -46,13 +46,9 @@ class OrcaWorkChain(WorkChain):
             "additional_retrieve_list": ["*.nto", "aiida.out"],
             "resources": {'num_machines': 1, 'num_mpiprocs_per_machine': 1},
         }
-        #Run ORCA (requires RabbitMQ, not configured by default on the "presto" profile)
-        #Also I cannot get it to work at all at the moment so using run_get_node instead.
-        # process = self.submit(builder)
-        # return ToContext(calc=process)
         
-        #Run without RabbitMQ
-        results, node = run_get_node(builder)
+        #Run ORCA
+        results = run(builder)
         #Return the output folder.
         self.out("nto_folder", results["retrieved"])
 
