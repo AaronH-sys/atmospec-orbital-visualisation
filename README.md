@@ -1,24 +1,30 @@
 # Standalone NTO Visualiser
-Python Module Requirements:
--Aiida
--nglview 
--ipywidgets
--traitlets
--ase
--aiida_shell
--cubehandler
--numpy
--PIL
+Python Module Requirements (pip install):
+- aiida-core
+- aiida-shell
+- nglview 
+- ipywidgets
+- cubehandler
+- ase
 
-Installation:
+### Installation:
 
 0)  [Install ORCA.](https://www.faccts.de/docs#orca)
 
 1) Pull/download files from repository and install all required Python Modules.
 
-2) Make an Aiida profile on your system. ```verdi presto [--profile-name NAME]```
+2) Make an AiiDA profile on your system using 
+```
+verdi presto [--profile-name NAME]
+```
 
-3) Setup the Aiida Codes for orca and orca_plot. ```verdi code create core.code.installed```
+3) Setup the AiiDA Codes for orca and orca_plot using 
+```
+verdi code create core.code.installed
+``` 
+and the settings below.
+
+
 ```
 Computer: localhost
 Filepath executable: PATH/TO/ORCA/orca
@@ -36,4 +42,15 @@ Default CalcJob plugin: orca.orca_plot
 Escape using double quotes [y/N]: n
 Prepend Text: export PATH=PATH/TO/ORCA/orca_plot:$PATH; export LD_LIBRARY_PATH=PATH/TO/ORCA/orca_plot:$LD_LIBRARY_PATH;
 ```
-4) Run "nglview.ipynb" to calculate NTOs and visualise them.
+### Usage
+Run "orbital_visualiser.ipynb", which will calculate NTOs and visualise them inside the notebook.
+
+### Atmospec Integration
+Integration with AtmoSpec can be found at https://github.com/AaronH-sys/aiidalab-ispg.
+
+Follow all installation instructions found in the README.
+Once on the AiiDAlab home page, open the terminal and enter 
+
+```aiidalab install ispg@git+https://github.com/AaronH-sys/aiidalab-ispg```.
+
+Setup the ORCA codes as you have done for the standalone and our updated fork of Atmospec should be ready to run.

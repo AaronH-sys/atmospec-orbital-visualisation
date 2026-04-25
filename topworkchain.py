@@ -7,16 +7,25 @@ class PrototypeTopWorkChain(WorkChain):
     @classmethod
     def define(cls, spec):
         super().define(spec)
-        spec.output("cube_folder", valid_type=FolderData, help="Compressed cube files")
-        spec.output("transition_info", valid_type=Dict, help="Information about the relevant electronic transitions.")
+
+        spec.output("cube_folder",
+                    valid_type=FolderData,
+                    help="Compressed cube files")
+        
+        spec.output("transition_info",
+                    valid_type=Dict,
+                    help="Information about the relevant electronic transitions.")
+
         spec.outline(
             cls.calc,
             cls.parse,
             cls.convert
         )
 
-    #runs the orca calculation.
     def calc(self):
+        # Geometry optimization using B3LYP functional and DEF2-SVP basis set, then
+        # TDDFT calculation of 30 excited states, with NTOs calculated for each.
+
         inputs = {
         "parameters" : Dict(dict={
         "charge": 0,
@@ -26,13 +35,19 @@ class PrototypeTopWorkChain(WorkChain):
         },
         "input_keywords": ["B3LYP", "DEF2-SVP", "LARGEPRINT"]
         })}
+
         results, node = run_get_node(OrcaWorkChain, **inputs)
         print(node)
+
+        #Return nto_folder to context for other functions to use
         self.ctx.nto_folder = results["nto_folder"]
     
-    #Parses the output to find relavant molecular orbitals.
+    
     def parse(self):
-        self.ctx.relevant_dict = parse_orca_output(self.ctx.nto_folder, "aiida.out", 5.0)
+        # Parses the ORCA output file to find relevant molecular orbitals to plot as cube files for each excited state.
+        # In this case, relevant orbitals are ones above the contribution threshold of 5%.
+
+        self.ctx.relevant_dict = parse_orca_output(self.ctx.nto_folder, "aiida.out", threshold=5.0)
         self.out("transition_info", self.ctx.relevant_dict)
 
     
