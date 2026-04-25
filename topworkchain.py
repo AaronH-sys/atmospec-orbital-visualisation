@@ -70,11 +70,11 @@ class PrototypeTopWorkChain(WorkChain):
                     #Set specific mo.
                     mo = moa[:-1]
                     builder.mo = mo
-                    results, node = run_get_node(NTOProcessingWorkChain, builder)
+                    results = run(NTOProcessingWorkChain, builder)
                     for label, value in results.items():
                         print(value)
                         with value.open(mode="rb") as file:
-                            cube_folder.put_object_from_filelike(file, path=("s"+s+"."+mo))
+                            cube_folder.put_object_from_filelike(file, path=("s"+s+"_"+mo))
         cube_folder.store()
         self.out("cube_folder", cube_folder)
 
