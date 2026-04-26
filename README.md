@@ -46,7 +46,7 @@ Prepend Text: export PATH=PATH/TO/ORCA/orca_plot:$PATH; export LD_LIBRARY_PATH=P
 Run "orbital_visualiser.ipynb", which will calculate NTOs for a chemical structure (by default Acrolein) and visualise them inside the notebook. The structure is defined as part of the OrcaWorkChain WorkChain defined in the subworkchains.py file.
 
 ### AtmoSpec Integration
-Integration with AtmoSpec can be found at https://github.com/AaronH-sys/aiidalab-ispg under the backendaiidashell branch.
+Integration with AtmoSpec can be found at https://github.com/AaronH-sys/aiidalab-ispg.
 
 Follow all installation instructions found in the README.
 Once on the AiiDAlab home page, open the terminal and enter 
