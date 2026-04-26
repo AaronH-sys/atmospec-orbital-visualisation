@@ -53,4 +53,4 @@ Once on the AiiDAlab home page, open the terminal and enter
 
 ```aiidalab install ispg@git+https://github.com/AaronH-sys/aiidalab-ispg```.
 
-Setup the ORCA codes as you have done for the standalone and our updated fork of AtmoSpec should be ready to run.
+Setup the ORCA codes within the Docker container as you have done for the standalone and install the Cubehandler Python library (https://github.com/nanotech-empa/cubehandler.git). This currently requires an edit to pyproject.toml to enable it to run under Python 3.9. Our updated fork of AtmoSpec should then be ready to run.
