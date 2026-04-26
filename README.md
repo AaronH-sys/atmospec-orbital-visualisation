@@ -43,7 +43,7 @@ Escape using double quotes [y/N]: n
 Prepend Text: export PATH=PATH/TO/ORCA/orca_plot:$PATH; export LD_LIBRARY_PATH=PATH/TO/ORCA/orca_plot:$LD_LIBRARY_PATH;
 ```
 ### Usage
-Run "orbital_visualiser.ipynb", which will calculate NTOs and visualise them inside the notebook.
+Run "orbital_visualiser.ipynb", which will calculate NTOs for a chemical structure (by default Acrolein) and visualise them inside the notebook. The structure is defined as part of the OrcaWorkChain WorkChain defined in the subworkchains.py file.
 
 ### Atmospec Integration
 Integration with AtmoSpec can be found at https://github.com/AaronH-sys/aiidalab-ispg under the backendaiidashell branch.
